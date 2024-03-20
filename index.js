@@ -1,36 +1,26 @@
 const fs = require('fs');
 
-// csv file parsing
-function parseCSV(filename) {
+// parsing csv file
+const parseCSV = (filename) => {
     const data = fs.readFileSync(filename, 'utf8');
-    const rows = data.trim().split('\n');
-    const headers = rows.shift().split(',');
-    const cars = rows.map(row => {
-        const values = row.split(',');
-        const car = {};
-        headers.forEach((header, index) => {
-            car[header.trim()] = values[index].trim();
-        });
-        return car;
-    });
-    return cars;
-}
+    const [headers, ...rows] = data.trim().split('\n').map(row => row.split(','));
+    return rows.map(values => Object.fromEntries(headers.map((header, index) => [header.trim(), values[index].trim()])));
+};
 
 // filter cars
-function filterCars(cars, filters) {
-    return cars.filter(car => {
-        for (const key in filters) {
-            if (car[key] !== filters[key]) {
-                return false;
-            }
-        }
-        return true;
-    });
-}
+const filterCars = (cars, filters) => cars.filter(car => Object.entries(filters).every(([key, value]) => car[key] === value));
 
-// print
+// least expensive car
+const findLeastExpensiveCar = (cars) => cars.reduce((min, car) => {
+    const price = parseFloat(car['selling_price']);
+    if (isNaN(price)) return min;
+    return (!min || price < parseFloat(min['selling_price'])) ? car : min;
+}, null);
+
+// print details
 const cars = parseCSV('cars.csv');
-const filteredCars = filterCars(cars, { 'fuel': 'Petrol', 'selling_price': '92000' }); // Example filter
+const filteredCars = filterCars(cars, { 'fuel': 'Petrol', 'selling_price': '92000' }); 
+const leastExpensiveCar = findLeastExpensiveCar(cars);
 
 console.log('Filtered Cars:', filteredCars);
-
+console.log('Least Expensive Car:', leastExpensiveCar);
