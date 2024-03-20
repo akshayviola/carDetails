@@ -1,36 +1,19 @@
-const fs = require('fs');
+import filterData from "./src/filters.js";
+import parseCsv from "./src/parseCsv.js";
+import { enterValues, promptForYesOrNo } from "./src/cmd.js";
 
-// csv file parsing
-function parseCSV(filename) {
-    const data = fs.readFileSync(filename, 'utf8');
-    const rows = data.trim().split('\n');
-    const headers = rows.shift().split(',');
-    const cars = rows.map(row => {
-        const values = row.split(',');
-        const car = {};
-        headers.forEach((header, index) => {
-            car[header.trim()] = values[index].trim();
-        });
-        return car;
-    });
-    return cars;
-}
+const main = async () => {
+  const cars = await parseCsv("./data/cars.csv");
+  const filters = await enterValues();
 
-// filter cars
-function filterCars(cars, filters) {
-    return cars.filter(car => {
-        for (const key in filters) {
-            if (car[key] !== filters[key]) {
-                return false;
-            }
-        }
-        return true;
-    });
-}
+  const isConformed = await promptForYesOrNo();
+  if (isConformed) {
+    const data = filterData(cars, filters);
+    console.log("🚀 ~ main ~ data:", JSON.stringify(data, null, 2));
+    process.exit(0);
+  }
+  console.log("🚀 ~user has cancelled the filter showing all data", cars);
+  process.exit(0);
+};
 
-// print
-const cars = parseCSV('cars.csv');
-const filteredCars = filterCars(cars, { 'fuel': 'Petrol', 'selling_price': '92000' }); // Example filter
-
-console.log('Filtered Cars:', filteredCars);
-
+main();
