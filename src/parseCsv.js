@@ -1,4 +1,5 @@
 import fs from "fs";
+import path from "path";
 import csv from "csv-parser";
 
 const parseCsv = (filename) => {
@@ -10,7 +11,7 @@ const parseCsv = (filename) => {
         data.push(row);
       })
       .on("end", () => {
-        console.log(`${filename} has been parsed`);
+        console.log(`${path.basename(filename)} has been parsed`);
         resolve(data);
       })
       .on("error", (error) => {
