@@ -5,14 +5,16 @@ import { enterValues, promptForYesOrNo } from "./src/cmd.js";
 const main = async () => {
   const cars = await parseCsv("./data/cars.csv");
   const filters = await enterValues();
-
   const isConformed = await promptForYesOrNo();
   if (isConformed) {
     const data = filterData(cars, filters);
     console.log("🚀 ~ main ~ data:", JSON.stringify(data, null, 2));
     process.exit(0);
   }
-  console.log("🚀 ~user has cancelled the filter showing all data", cars);
+  console.log(
+    "🚀 ~user has cancelled the filter showing all data",
+    JSON.stringify(cars, null, 2)
+  );
   process.exit(0);
 };
 
