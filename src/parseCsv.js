@@ -11,7 +11,7 @@ const parseCsv = (filename) => {
         data.push(row);
       })
       .on("end", () => {
-        console.log(`${path.basename(filename)} has been parsed`);
+        console.log(`${path.basename(filename)} has been parsed\n\n`);
         resolve(data);
       })
       .on("error", (error) => {
