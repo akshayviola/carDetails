@@ -1,36 +1,47 @@
-const fs = require('fs');
+import { filterData, findHighestExpensiveCars } from "./src/filters.js";
+import parseCsv from "./src/parseCsv.js";
+import { enterValues, promptForYesOrNo, promptForLeastExpensiveCar, promptForHighestExpensiveCar } from "./src/cmd.js";
+import { findLeastExpensiveCar } from "./src/filters.js";
+const main = async () => {
+  const cars = await parseCsv("./data/cars.csv");
 
-// csv file parsing
-function parseCSV(filename) {
-    const data = fs.readFileSync(filename, 'utf8');
-    const rows = data.trim().split('\n');
-    const headers = rows.shift().split(',');
-    const cars = rows.map(row => {
-        const values = row.split(',');
-        const car = {};
-        headers.forEach((header, index) => {
-            car[header.trim()] = values[index].trim();
-        });
-        return car;
-    });
-    return cars;
-}
+  
+  const filters = await enterValues();
 
-// filter cars
-function filterCars(cars, filters) {
-    return cars.filter(car => {
-        for (const key in filters) {
-            if (car[key] !== filters[key]) {
-                return false;
-            }
-        }
-        return true;
-    });
-}
+  
+// least
+  const getLeastExpensiveCar = await promptForLeastExpensiveCar();
+  if(getLeastExpensiveCar){
+    const leastExpensiveCar = findLeastExpensiveCar(cars);
+    console.log("Least Expensive Car:", leastExpensiveCar);
+  }
+  // highest
+  const getHighestExpensiveCar = await promptForHighestExpensiveCar();
+  if(getHighestExpensiveCar){
+    const highestExpensiveCar = findHighestExpensiveCars(cars);
+    console.log("Higest Expensive Cars:",highestExpensiveCar);
+  }
 
-// print
-const cars = parseCSV('cars.csv');
-const filteredCars = filterCars(cars, { 'fuel': 'Petrol', 'selling_price': '92000' }); // Example filter
+ 
+  
+  const isConformed = await promptForYesOrNo();
+  if (isConformed) {
+    const data = filterData(cars, filters);
+    
+    console.log("🚀 ~ main ~ data:", JSON.stringify(data, null, 2));
+    
+    process.exit(0);
+    
+  }
 
-console.log('Filtered Cars:', filteredCars);
+console.log(
+    "🚀 ~user has cancelled the filter showing all data",
+    JSON.stringify(cars, null, 2)
+  );
+  process.exit(0);
 
+  
+};
+
+
+main();
