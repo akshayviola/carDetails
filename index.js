@@ -4,15 +4,11 @@ import { enterValues, promptForYesOrNo, promptForLeastExpensiveCar, promptForHig
 import { findLeastExpensiveCar } from "./src/filters.js";
 
 const main = async () => {
-  // Execute the enterValues() function to gather filter inputs
   
-
   const cars = await parseCsv("./data/cars.csv");
   const filters = await enterValues();
-  // Prompt the user whether they want to show filtered data
-  const isConformed = await promptForYesOrNo();
 
-  // If confirmed, filter the data based on the entered values
+  const isConformed = await promptForYesOrNo();
   if (isConformed) {
     const data = filterData(cars, filters);
     console.log("🚀 ~ main ~ data:", JSON.stringify(data, null, 2));
